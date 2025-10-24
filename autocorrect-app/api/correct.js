@@ -1,91 +1,108 @@
-// api/correct.js
+// --- Gemini API Configuration ---
+// These definitions are now secure on the backend
+const SYSTEM_INSTRUCTION = `You are an expert proofreader. Your task is to correct grammar, spelling, and punctuation errors in the provided text.
+You MUST respond in the requested JSON format.
+Your response must include:
+1.  'correctedText': The full, corrected version of the text.
+2.  'wrongWords': An array of strings. Each string must be an *exact* word or phrase from the *original* text that you identified as incorrect (e.g., 'mispelled', 'grammer', 'their are'). Only include words that were actually changed.`;
+        
+const RESPONSE_SCHEMA = {
+    type: "OBJECT",
+    properties: {
+        "correctedText": { "type": "STRING" },
+        "wrongWords": {
+            "type": "ARRAY",
+            "items": { "type": "STRING" }
+        }
+    },
+    required: ["correctedText", "wrongWords"]
+};
 
-// FIX: Using a more specific and stable model name for the v1beta API.
-const GEMINI_MODEL = 'gemini-2.5-flash-preview-05-20';
-
-// This is an ES Module handler, standard for modern Netlify functions.
-export default async (req) => {
-    // 1. We only accept POST requests
-    if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ message: 'Method Not Allowed' }), {
-            status: 405,
-            headers: { 'Content-Type': 'application/json' },
-        });
+// The main Netlify Function handler
+// Netlify automatically knows 'exports.handler' is the function to run
+exports.handler = async (event, context) => {
+    // 1. Only allow POST requests
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method Not Allowed' }),
+        };
     }
 
     try {
-        // 2. Get the user's text and prompt from the request body
-        const { text, systemPrompt } = await req.json();
-        const apiKey = process.env.GEMINI_API_KEY; // 3. Securely get the API key
+        // 2. Get the user's text from the frontend's request
+        const { inputText } = JSON.parse(event.body);
+        if (!inputText) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'inputText is required' }),
+            };
+        }
 
+        // 3. SECURELY get the API key from Netlify Environment Variables
+        // You must set GEMINI_API_KEY in your Netlify dashboard
+        const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'API key is not configured.' }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            // This error will only show in your Netlify logs, not to the user
+            console.error('API key is missing from environment variables');
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Server configuration error' }),
+            };
         }
         
-        if (!text || !systemPrompt) {
-            return new Response(JSON.stringify({ error: 'Both "text" and "systemPrompt" are required.' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
-        }
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-
+        // 4. Construct the payload to send to Gemini
         const payload = {
-            contents: [{ parts: [{ text: text }] }],
+            contents: [{
+                parts: [{ text: inputText }]
+            }],
             systemInstruction: {
-                parts: [{ text: systemPrompt }]
+                parts: [{ text: SYSTEM_INSTRUCTION }]
             },
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: RESPONSE_SCHEMA
+            }
         };
 
-        // 4. Call the Gemini API from the secure backend
-        const apiResponse = await fetch(apiUrl, {
+        // 5. Call the real Gemini API
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(payload)
         });
 
-        const result = await apiResponse.json();
-
-        if (!apiResponse.ok) {
-            console.error("API Error:", result);
-            throw new Error(result.error?.message || `API request failed with status ${apiResponse.status}`);
-        }
-        
-        const candidate = result.candidates?.[0];
-
-        if (candidate?.finishReason === 'SAFETY') {
-             return new Response(JSON.stringify({ error: 'The request was blocked due to safety concerns. Please modify your input.' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Gemini API Error:', errorBody);
+            throw new Error(errorBody.error?.message || `Gemini API failed with status ${response.status}`);
         }
 
-        if (candidate && candidate.content?.parts?.[0]?.text) {
-            const generatedText = candidate.content.parts[0].text;
-            const sources = [];
-            
-            // 5. Send the clean, expected object back
-            return new Response(JSON.stringify({ text: generatedText.trim(), sources }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
-        } else {
-            console.error("Unexpected API response structure:", result);
-            return new Response(JSON.stringify({ error: "Invalid response structure from the AI API." }), {
-                status: 500,
-                headers: { 'Content-Type': 'application/json' },
-            });
+        const result = await response.json();
+
+        // 6. Parse the Gemini response
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+            throw new Error("Invalid response structure from Gemini API.");
         }
+
+        const parsedJson = JSON.parse(text);
+        const correctedText = parsedJson.correctedText || "";
+        const wrongWords = parsedJson.wrongWords || [];
+
+        // 7. Send the clean data back to the frontend
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ correctedText, wrongWords })
+        };
 
     } catch (error) {
-        console.error('Internal Server Error:', error);
-        return new Response(JSON.stringify({ error: error.message || 'An internal error occurred.' }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        console.error('Error in Netlify function:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message || 'An unknown server error occurred' })
+        };
     }
 };

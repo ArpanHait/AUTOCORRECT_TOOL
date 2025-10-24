@@ -1,0 +1,3 @@
+[build]
+  # This tells Netlify to look for functions in the 'api' directory
+  functions = "api"

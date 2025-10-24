@@ -3,379 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Driven AutoCorrect Tool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI Autocorrect Tool (Pure CSS)</title>
+    
+    <!-- Google Font -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* --- STYLES FOR HIGHLIGHTING --- */
-        .highlight-container {
-            position: relative;
-            font-size: 1.125rem; /* text-lg */
-            line-height: 1.75rem; /* leading-relaxed */
-        }
-        #userInput {
-            background-color: transparent;
-            color: transparent;
-            caret-color: #1f2937; /* Gray-800, makes the typing cursor visible */
-            z-index: 1; /* Ensure textarea is on top for typing */
-        }
-        #highlight-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0; /* Behind the textarea */
-            pointer-events: none; /* Clicks go through to the textarea */
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            height: 100%;
-            overflow: hidden; /* CRITICAL FIX: Prevents text from spilling out of the container */
-        }
-        #highlight-overlay .error {
-            background-color: #ff6ae1; /* Red-200 for error highlight */
-            border-radius: 0.25rem;
-            cursor: help;
-        }
-        #background-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border-left-color: #3b82f6;
-            animation: spin 1s ease infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .copy-notification {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
-        .action-button {
-            background-color: #2563eb;
-            color: white;
-            font-weight: bold;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .action-button:hover {
-            background-color: #1d48d8;
-            transform: scale(1.05);
-        }
-        .action-button:active {
-            transform: scale(0.95);
-        }
-        .action-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: scale(1);
-            background-color: #93c5fd;
-        }
-        .aura-effect {
-            box-shadow: 0 10px 35px -5px rgba(32, 113, 243, 0.35), 0 8px 20px -6px rgba(48, 116, 224, 0.35);
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     </style>
+
+    <!-- Link to your local CSS file -->
+    <link rel="stylesheet" href="style.css">
+
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <canvas id="background-canvas"></canvas>
-    <div class="w-full max-w-3xl mx-auto p-4 md:p-8">
-        <div class="bg-white rounded-2xl p-6 md:p-10 aura-effect">
-            <header class="text-center mb-8">
-                <div class="flex justify-center items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800">AI-Driven AutoCorrect Tool</h1>
-                </div>
-                <p class="text-gray-500 mt-2">Correct grammar and spelling in your emails, letters, and documents.</p>
-            </header>
+<body>
 
-            <div class="space-y-6">
-                <div>
-                    <label for="userInput" class="text-lg font-semibold text-gray-700">Let Me Test It.😋</label>
-                    <!-- Correction: Using the highlight container structure -->
-                    <div class="highlight-container relative mt-2">
-                        <textarea id="userInput" rows="8" class="relative w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow duration-200 text-lg leading-relaxed" placeholder="Paste your email, letter, or any long text here..."></textarea>
-                        <div id="highlight-overlay" class="absolute top-0 left-0 w-full p-4 text-lg leading-relaxed pointer-events-none"></div>
-                    </div>
-                </div>
-                <div class="flex flex-wrap justify-center items-center gap-4">
-                    <button id="correctButton" class="action-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        Correct Text
-                    </button>
-                    <button id="clearButton" class="action-button hidden bg-gray-500 hover:bg-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        Clear
-                    </button>
-                </div>
-            </div>
-
-            <div id="loader" class="hidden flex justify-center items-center my-6">
-                <div class="spinner"></div>
-            </div>
-
-            <div id="result" class="hidden mt-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 id="resultTitle" class="text-xl font-bold text-gray-800"></h2>
-                    <div class="relative">
-                        <button id="copyButton" class="flex items-center gap-2 text-sm text-gray-600 bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded-md transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            Copy
-                        </button>
-                        <span id="copyNotification" class="copy-notification absolute -top-8 right-0 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-md opacity-0 transform translate-y-2">Copied!</span>
-                    </div>
-                </div>
-                <div id="textOutput" class="text-lg p-6 bg-gray-50 border border-gray-200 rounded-lg leading-relaxed whitespace-pre-wrap"></div>
-            </div>
-             <div id="error" class="hidden mt-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-lg">
-                <p id="errorMessage"></p>
-            </div>
-            
-            <footer class="text-center mt-8">
-                <p class="text-sm text-gray-400">Designed by Ar.®</p>
-            </footer>
+    <!-- Background Animation Container -->
+    <div class="gradient-bg"></div>
+    <div id="particles-container"></div>
+    <!-- Main Container -->
+    <div class="main-card">
+        
+        <!-- Header -->
+        <div class="header-container">
+            <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+            </svg>
+            <h1 class="header-title">
+                <span>AI-Driven</span> <span>AutoCorrect</span> <span>Tool</span>
+            </h1>
         </div>
+        <!-- Subtitle -->
+        <p class="subheader">
+            <span>Correct</span> <span>grammar</span> <span>and</span> <span>spelling</span> <span>in</span> <span>your</span> <span>emails,</span> <span>letters,</span> <span>and</span> <span>documents</span>.
+            
+        </p>
+
+        <!-- Error Message Box -->
+        <div id="error-message" class="hidden" role="alert">
+            <strong>Error: </strong>
+            <span id="error-text">Something went wrong.</span>
+        </div>
+
+        <div>
+            
+            <!-- Input Column -->
+            <div>
+                <label for="input-text">Let Me Test It.😋</label>
+                <textarea id="input-text" rows="10" placeholder="Paste your text here..."></textarea>
+                <div id="input-display" class="hidden"></div>
+            </div>
+
+            <!-- Button Container -->
+            <div class="button-container">
+                <!-- Correct Button -->
+                <button id="correct-btn" class="button">
+                    <!-- Check Icon in a box -->
+                    <span id="check-icon-box" class="icon-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                        </svg>
+                    </span>
+                    <!-- Loader SVG -->
+                    <svg id="loader" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="correct-btn-text">Correct Text</span>
+                </button>
+                
+                <!-- Clear Button -->
+                <button id="clear-btn" class="button hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                    Clear
+                </button>
+            </div>
+
+            <!-- Output Column -->
+            <div id="output-container" class="hidden">
+                <div class="output-header">
+                    <label for="output-text">Corrected Text</label>
+                    <!-- Copy Button -->
+                    <button id="copy-btn" class="hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a2.25 2.25 0 0 1-2.25 2.25h-3a2.25 2.25 0 0 1-2.25-2.25V4.5A2.25 2.25 0 0 1 9 2.25h3C13.5 2.25 15 3.75 15 5.25v.375Z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6.75h-9A1.5 1.5 0 0 0 6 8.25v9a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 16.5 6.75Z" />
+                        </svg>
+                        <span>Copy</span>
+                    </button>
+                </div>
+                <!-- Copy success message -->
+                <span id="copy-msg" class="hidden">Copied to clipboard!</span>
+                
+                <!-- Output textarea -->
+                <textarea id="output-text" rows="8" readonly placeholder="Corrections will appear here..."></textarea>
+            </div>
+
+        </div>
+        
+        <!-- Footer -->
+        <p class="footer">
+            Designed by Ar.®
+        </p>
+
     </div>
 
-    <script>
-        const correctButton = document.getElementById('correctButton');
-        const clearButton = document.getElementById('clearButton');
-        const copyButton = document.getElementById('copyButton');
-        const copyNotification = document.getElementById('copyNotification');
-        const userInput = document.getElementById('userInput');
-        const textOutput = document.getElementById('textOutput');
-        const resultDiv = document.getElementById('result');
-        const resultTitle = document.getElementById('resultTitle');
-        const loader = document.getElementById('loader');
-        const highlightOverlay = document.getElementById('highlight-overlay');
-        const errorDiv = document.getElementById('error');
-        const errorMessage = document.getElementById('errorMessage');
+    <!-- Link to your frontend JavaScript file -->
+    <script src="script.js"></script>
 
-        let rawResultText = '';
-
-        correctButton.addEventListener('click', handleCorrection);
-        clearButton.addEventListener('click', handleClear);
-        copyButton.addEventListener('click', handleCopy);
-
-        userInput.addEventListener('scroll', () => {
-            highlightOverlay.scrollTop = userInput.scrollTop;
-            highlightOverlay.scrollLeft = userInput.scrollLeft;
-        });
-
-        userInput.addEventListener('input', () => {
-            highlightOverlay.textContent = userInput.value;
-            resultDiv.classList.add('hidden');
-            clearButton.classList.add('hidden');
-            hideError();
-        });
-
-        async function handleCorrection() {
-            const textToProcess = userInput.value.trim();
-            if (!textToProcess) {
-                showError("Please enter some text to correct.");
-                return;
-            }
-
-            hideError();
-            resultDiv.classList.add('hidden');
-            loader.classList.remove('hidden');
-            correctButton.disabled = true;
-
-            const systemPrompt = "You are an expert English grammar and spelling checker. Your task is to correct the user's text. Only provide the corrected version of the text in your response. Do not add any extra explanations, apologies, or introductory phrases. Just the corrected text.";
-
-            try {
-                const { text: correctedText } = await callBackendApi(textToProcess, systemPrompt);
-                rawResultText = correctedText;
-                
-                resultTitle.textContent = "Corrected Text";
-                textOutput.textContent = correctedText;
-                resultDiv.classList.remove('hidden');
-                clearButton.classList.remove('hidden');
-
-                displayHighlights(textToProcess, correctedText);
-
-            } catch (err) {
-                console.error('API Call Failed:', err);
-                showError(`An error occurred: ${err.message}. Check the console for more details.`);
-            } finally {
-                loader.classList.add('hidden');
-                correctButton.disabled = false;
-            }
-        }
-
-        function handleClear() {
-            userInput.value = '';
-            highlightOverlay.innerHTML = '';
-            resultDiv.classList.add('hidden');
-            clearButton.classList.add('hidden');
-            hideError();
-        }
-
-        function handleCopy() {
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = rawResultText;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            copyNotification.classList.remove('opacity-0', 'translate-y-2');
-            copyNotification.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                copyNotification.classList.remove('opacity-100', 'translate-y-0');
-                copyNotification.classList.add('opacity-0', 'translate-y-2');
-            }, 2000);
-        }
-        
-        async function callBackendApi(text, systemPrompt) {
-            // *** THIS IS THE MAJOR FIX ***
-            // This is the standard, reliable path to a Netlify function.
-            const apiUrl = '/.netlify/functions/correct';
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text, systemPrompt: systemPrompt })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Unknown server error');
-            }
-            
-            return result; // Return the whole object { text, sources }
-        }
-       
-        function displayHighlights(original, corrected) {
-            const diffs = diffWords(original, corrected);
-            const fragment = document.createDocumentFragment();
-            let lastRemovedSpan = null;
-            let currentSuggestion = '';
-            const isWordChar = (char) => /[a-zA-Z0-9]/.test(char);
-
-            diffs.forEach(part => {
-                if (part.added) {
-                    if (isWordChar(part.value.trim())) {
-                        currentSuggestion += part.value;
-                    }
-                } else {
-                    if (currentSuggestion && lastRemovedSpan) {
-                        lastRemovedSpan.title = `Suggested correction: "${currentSuggestion.trim()}"`;
-                        lastRemovedSpan = null;
-                    }
-                    currentSuggestion = '';
-
-                    const span = document.createElement('span');
-                    span.textContent = part.value;
-                    if (part.removed && isWordChar(part.value.trim())) {
-                        span.className = 'error';
-                        lastRemovedSpan = span;
-                    }
-                    fragment.appendChild(span);
-                }
-            });
-            if (currentSuggestion && lastRemovedSpan) {
-                lastRemovedSpan.title = `Suggested correction: "${currentSuggestion.trim()}"`;
-            }
-            highlightOverlay.innerHTML = '';
-            highlightOverlay.appendChild(fragment);
-        }
-        
-        function diffWords(oldStr, newStr) {
-            const splitRegex = /(\s+|[^\w\s])/g;
-            const oldWords = oldStr.split(splitRegex).filter(Boolean);
-            const newWords = newStr.split(splitRegex).filter(Boolean);
-            const dp = Array(oldWords.length + 1).fill(null).map(() => Array(newWords.length + 1).fill(0));
-            for (let i = 1; i <= oldWords.length; i++) {
-                for (let j = 1; j <= newWords.length; j++) {
-                    if (oldWords[i - 1] === newWords[j - 1]) {
-                        dp[i][j] = dp[i - 1][j - 1] + 1;
-                    } else {
-                        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-                    }
-                }
-            }
-            const result = [];
-            let i = oldWords.length, j = newWords.length;
-            while (i > 0 || j > 0) {
-                if (i > 0 && j > 0 && oldWords[i - 1] === newWords[j - 1]) {
-                    result.unshift({ value: oldWords[i - 1], common: true });
-                    i--; j--;
-                } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-                    result.unshift({ value: newWords[j - 1], added: true });
-                    j--;
-                } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
-                    result.unshift({ value: oldWords[i - 1], removed: true });
-                    i--;
-                }
-            }
-            return result;
-        }
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorDiv.classList.remove('hidden');
-        }
-
-        function hideError() {
-            errorDiv.classList.add('hidden');
-        }
-
-        (function() {
-            const canvas = document.getElementById('background-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let width = canvas.width = window.innerWidth;
-            let height = canvas.height = window.innerHeight;
-            const mouse = { x: null, y: null, radius: 150 };
-            window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
-            window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
-            let particles = [];
-            const PARTICLE_COLOR = 'rgba(59, 130, 246, 0.7)';
-            const LINE_COLOR_BASE = '150, 180, 255';
-            const CONNECT_DISTANCE = 140;
-            class Particle {
-                constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.vx = (Math.random() - 0.5) * 0.8; this.vy = (Math.random() - 0.5) * 0.8; this.radius = Math.random() * 2 + 1.5; }
-                update() {
-                    this.x += this.vx; this.y += this.vy;
-                    if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
-                    if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
-                    if (mouse.x && mouse.y) {
-                        const dx = mouse.x - this.x; const dy = mouse.y - this.y; const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < mouse.radius) { const forceDirectionX = dx / distance; const forceDirectionY = dy / distance; const force = (mouse.radius - distance) / mouse.radius; this.x -= forceDirectionX * force * 2; this.y -= forceDirectionY * force * 2; }
-                    }
-                }
-                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = PARTICLE_COLOR; ctx.fill(); }
-            }
-            function init() { particles = []; const count = Math.floor((width * height) / 15000); for (let i = 0; i < count; i++) particles.push(new Particle()); }
-            function connect() {
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance < CONNECT_DISTANCE) { const opacity = 1 - (distance / CONNECT_DISTANCE); ctx.strokeStyle = `rgba(${LINE_COLOR_BASE}, ${opacity})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); }
-                    }
-                }
-            }
-            function animate() { ctx.clearRect(0, 0, width, height); particles.forEach(p => { p.update(); p.draw(); }); connect(); requestAnimationFrame(animate); }
-            window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; init(); });
-            init(); animate();
-        })();
-    </script>
 </body>
 </html>
