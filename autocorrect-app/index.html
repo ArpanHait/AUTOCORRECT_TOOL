@@ -98,6 +98,37 @@
                 
                 <!-- Output textarea -->
                 <textarea id="output-text" rows="8" readonly placeholder="Corrections will appear here..."></textarea>
+                <!-- START: ADD THIS NEW CODE BLOCK -->
+        <div id="tone-changer-container" class="hidden">
+            <label class="tone-label">
+                ✨ Change Tone
+                <!-- Tone-specific loader -->
+                <svg id="tone-loader" class="hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </label>
+            <div class="button-container tone-buttons">
+                <button id="btn-professional" class="button button-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.07a2.25 2.25 0 0 1-2.25 2.25H5.625a2.25 2.25 0 0 1-2.25-2.25v-4.07m16.5 0v-3.875a2.25 2.25 0 0 0-2.25-2.25H5.625a2.25 2.25 0 0 0-2.25 2.25v3.875m16.5 0c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m16.5 0v-3.875a2.25 2.25 0 0 0-2.25-2.25H5.625a2.25 2.25 0 0 0-2.25 2.25v3.875M21.75 8.25v.563c0 .621-.504 1.125-1.125 1.125H3.375c-.621 0-1.125-.504-1.125-1.125V8.25m18.375 0c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m18.375 0v-1.875a2.25 2.25 0 0 0-2.25-2.25H5.625a2.25 2.25 0 0 0-2.25 2.25v1.875m18.375 0c.621 0 1.125-.504 1.125-1.125V6.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 12.75a.75.75 0 0 0 .75-.75v-1.5a.75.75 0 0 0-1.5 0v1.5a.75.75 0 0 0 .75.75Z" />
+                    </svg>
+                    Make Professional
+                </button>
+                <button id="btn-friendly" class="button button-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm4.5 0c0 .414-.168.75-.375.75S13.5 10.164 13.5 9.75s.168-.75.375-.75.375.336.375.75Z" />
+                    </svg>
+                    Make Friendlier
+                </button>
+                <button id="btn-concise" class="button button-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.848 8.25l1.536 1.536m-1.536-1.536L6.312 9.786m1.536-1.536L9.384 6.714m-1.536 1.536L7.848 9.786m6.304 6.304l1.536 1.536m-1.536-1.536l-1.536 1.536m1.536-1.536l1.536-1.536m-1.536 1.536l-1.536-1.536M12 2.25v2.25m0 15v2.25M4.717 4.717v2.25m14.566-2.25v2.25M4.717 19.283v-2.25m14.566 2.25v-2.25M2.25 12h2.25m15 0h2.25M12 6.75a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Zm0 0a5.25 5.25 0 1 0-10.5 0 5.25 5.25 0 0 0 10.5 0Zm0 0V2.25m0 4.5v2.25m0 0a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Zm0 0a5.25 5.25 0 1 0-10.5 0 5.25 5.25 0 0 0 10.5 0Z" />
+                    </svg>
+                    Make Concise
+                </button>
+            </div>
+        </div>
             </div>
 
         </div>
