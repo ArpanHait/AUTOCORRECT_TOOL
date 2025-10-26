@@ -16,27 +16,47 @@ const errorMessage = document.getElementById('error-message');
 const errorText = document.getElementById('error-text');
 const particlesContainer = document.getElementById('particles-container');
 
+const toneChangerContainer = document.getElementById('tone-changer-container');
+const toneLoader = document.getElementById('tone-loader');
+const btnProfessional = document.getElementById('btn-professional');
+const btnFriendly = document.getElementById('btn-friendly');
+const btnConcise = document.getElementById('btn-concise');
+
 // --- API Configuration ---
 // The API call is now made to our OWN backend function
 // This path matches your 'api/correct.js' file structure
-const apiFunctionUrl = '/api/correct';
-                                                                        
-// --- Event Listeners ---
+const apiFunctionUrl = '/api/correct';                                                                     
 correctBtn.addEventListener('click', handleCorrect);
 clearBtn.addEventListener('click', handleClear);
 copyBtn.addEventListener('click', handleCopy);
+
+btnProfessional.addEventListener('click', () => handleChangeTone('professional'));
+btnFriendly.addEventListener('click', () => handleChangeTone('friendly'));
+btnConcise.addEventListener('click', () => handleChangeTone('concise'));
+
 document.addEventListener('DOMContentLoaded', () => {
     generateParticles(30); // Generate 30 particles
 });
 
-// --- Functions ---
+// ADD this variable near the top of your script
+let errorHideTimeout; 
 
 function showError(message) {
+    // Clear any existing timeout to hide the message
+    if (errorHideTimeout) {
+        clearTimeout(errorHideTimeout);
+    }
+    
+    errorMessage.classList.remove('hidden'); // <-- ADD THIS LINE
     errorText.textContent = message || "An unknown error occurred.";
-    errorMessage.classList.remove('hidden');
-    setTimeout(() => {
-        errorMessage.classList.add('hidden');
-    }, 5000);
+    errorMessage.classList.add('show');
+
+    // Set a new timeout to hide the message
+    errorHideTimeout = setTimeout(() => {
+        errorMessage.classList.remove('show');
+        // errorMessage.classList.add('hidden'); // Optional: re-add hidden if needed after transition
+        errorHideTimeout = null; // Clear the timeout reference
+    }, 5000); // Hide after 5 seconds
 }
 
 function setLoading(isLoading) {
@@ -145,25 +165,24 @@ function displayResults(correctedText, wrongWords) {
     correctBtn.classList.add('hidden'); 
     correctBtn.disabled = true; 
     clearBtn.disabled = false; 
+    toneChangerContainer.classList.remove('hidden');
 }
 
 function handleClear() {
+    // (Your other clearing logic is here and is correct)
     inputTextarea.value = '';
     outputTextarea.value = '';
-    inputDisplay.innerHTML = '';
-
-    inputTextarea.classList.remove('hidden');
-    inputDisplay.classList.add('hidden');
-    
-    outputContainer.classList.add('hidden');
-    copyBtn.classList.add('hidden');
-    clearBtn.classList.add('hidden'); 
-    correctBtn.classList.remove('hidden'); 
-    
-    correctBtn.disabled = false; 
     
     copyMsg.classList.add('hidden');
-    errorMessage.classList.add('hidden');
+    if (errorHideTimeout) {
+        clearTimeout(errorHideTimeout);
+        errorHideTimeout = null;
+    }
+    errorMessage.classList.remove('show');
+    errorMessage.classList.add('hidden'); // Re-add the hidden class
+    
+    // Hide tone changer
+    toneChangerContainer.classList.add('hidden');
 }
 
 function handleCopy() {
@@ -233,4 +252,63 @@ function createParticle() {
             setTimeout(createParticle, 50); 
         }
     });
+}
+
+// --- (Should be after the createParticle function) ---
+
+/**
+ * Shows/hides the loading state for the tone-changer buttons.
+ */
+function setToneLoading(isLoading) {
+    // Disable buttons
+    btnProfessional.disabled = isLoading;
+    btnFriendly.disabled = isLoading;
+    btnConcise.disabled = isLoading;
+
+    // Show/hide loader
+    if (isLoading) {
+        toneLoader.classList.remove('hidden');
+    } else {
+        toneLoader.classList.add('hidden');
+    }
+}
+
+/**
+ * Handles the "Change Tone" LLM call.
+ * This calls a NEW, separate backend function: /api/changeTone
+ */
+async function handleChangeTone(tone) {
+    const currentText = outputTextarea.value;
+    if (!currentText.trim()) {
+        showError("There is no text to change.");
+        return;
+    }
+
+    setToneLoading(true);
+
+    try {
+        // We call a new, separate backend function for this
+        const result = await fetchWithRetry('/api/changeTone', { // <<< Calls the new backend function
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                inputText: currentText,
+                tone: tone
+            })
+        });
+        
+        // The backend function just returns the new text
+        if (result.newText === undefined) { // Check for undefined specifically
+            throw new Error("Invalid response from tone change function.");
+        }
+
+        // Update the corrected text box with the new tone!
+        outputTextarea.value = result.newText.trim();
+
+    } catch (error) {
+        console.error('Error during tone change:', error);
+        showError(`Failed to change tone: ${error.message}`);
+    } finally {
+        setToneLoading(false);
+    }
 }

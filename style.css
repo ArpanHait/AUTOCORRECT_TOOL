@@ -37,8 +37,9 @@ body {
     width: 100%;
     max-width: 44rem; /* max-w-2xl */
     padding: 1.5rem; /* p-6 */
-    background-color: rgba(255, 255, 255, 0.8); /* bg-white/80 */
-    /* backdrop-filter: blur(16px);              */
+    background-color: rgba(255, 255, 255, 0.749); /* bg-white/80 */
+    -webkit-backdrop-filter: blur(16px); /* For Safari */
+    backdrop-filter: blur(16px);
     border-radius: 1.5rem; /* rounded-2xl */
     box-shadow: 0px 5px 25px -9px rgba(43, 128, 255, 0.39); /* shadow-2xl */
     transition: all 0.4s ease-in-out;
@@ -123,11 +124,11 @@ body {
     font-size: 0.875rem; /* text-sm */
     margin-top: 3rem; /* mt-8 */
     margin-bottom: 0rem;
-    transition: all 0.8s ease-in-out;
+    transition: all 0.4s ease-in-out;
 }
 
 .footer:hover{
-    transform: scale(-1.00) translateZ(2px);
+    transform: scale(1.08)translateY(-5px);
 }
 
 label {
@@ -142,9 +143,10 @@ label {
 textarea {
     width: 100%;
     padding: 1rem; /* p-4 */
-    border: 1px solid #d1d5db; /* border border-gray-300 */
+    border: 1.5px solid #d1d5db; /* border border-gray-300 */
+    background-color: #fdfdfd84;
     border-radius: 0.5rem; /* rounded-lg */
-    box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05); /* shadow-inner */
+    box-shadow: inset 0px 0px 5px 2px rgba(0,0,0,0.05); /* shadow-inner */
     resize: none;
     font-family: 'Inter', sans-serif;
     transition: all 0.3s ease-in-out ;
@@ -184,13 +186,24 @@ textarea:focus {
 }
 
 #output-text {
-    background-color: #f3f4f6; /* bg-gray-100 */
+    background-color: #cee4ef; /* bg-gray-100 */
+    border: 2px solid #d1d5db;
     min-height: 220px; /* From rows=8 */
+    transition: all 0.3s ease-in-out;
+    padding: 1rem;
 }
-
+/* NEW: Target the emoji in the label */
+label[for="input-text"] span {
+    display: inline-block; /* Required for transform to work */
+    transition: all 0.5s ease-in-out;
+}
+label[for="input-text"] span:hover {
+    transform: scale(1.5) translateY(-7px) rotate(360deg);
+}
 #output-text:focus {
-    border-color: #22c55e; /* focus:ring-green-500 */
-    box-shadow: 0 0 0 2px #22c55e; /* focus:ring-2 */
+    outline: none;
+    border-color: #12b34d; /* focus:ring-green-500 */
+    box-shadow:inset 0px 0px 5px 0px #22c55e8c; /* focus:ring-2 */
 }
 
 /* --- Button Container --- */
@@ -228,9 +241,9 @@ textarea:focus {
     cursor: not-allowed;
 }
 
-.button:focus {
+  .button:focus {
+    border: 2px solid rgba(252, 252, 252, 0.87);
     outline: none;
-    box-shadow: 0 0 0 2px white, 0 0 0 4px #2563eb; /* focus:ring-2 focus:ring-offset-2 */
 }
 
 /* Responsive button width */
@@ -242,21 +255,33 @@ textarea:focus {
 
 /* Correct Button */
 #correct-btn {
-    background-color: #2563eb; /* bg-blue-600 */
-    color: white;
+    /* background-color: #431ec9cf; */
+    color: #ffffff;
+    background: linear-gradient(-45deg, #d6b1fbf0,#3f92e4c7, #50bbf5c5);
+    transition: all 0.4s ease-in-out;
 }
+     
 #correct-btn:hover:not(:disabled) {
-    background-color: #2351ce; /* hover:bg-blue-700 */
+    background: linear-gradient(-45deg, #dab9f8d7, #fbc2ebd7, #83c1fe, #a1c4fdd0);
+    background-size: 400% 400%; /* ADD: Ensure size is also on hover */
+    animation: gradient 3s ease infinite; /* CHANGE: Speed up the animation on hover */
 }
+
 #correct-btn .icon-box {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 1.5rem; /* w-6 */
     height: 1.5rem; /* h-6 */
-    border: 2px solid rgba(255, 255, 255, 0.4); /* border border-white/40 */
+    border: 2px solid rgb(255, 255, 255); /* border border-white/40 */
     border-radius: 0.25rem; /* rounded-sm */
+    transition: all 0.4s ease-in-out;
 }
+
+#correct-btn:hover:not(:disabled) .icon-box {
+   transform: scale(1.04) rotate(47deg);
+}
+
 #correct-btn .icon-box svg {
     height: 1rem; /* h-4 */
     width: 1rem; /* w-4 */
@@ -264,24 +289,26 @@ textarea:focus {
 
 /* Loader */
 #loader {
-    animation: spin 1s linear infinite;
+    animation: spin-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     height: 1.5rem; /* h-6 */
     width: 1.5rem; /* w-6 */
-    color: rgba(45, 229, 220, 0.836);
+    color: #ffffff;
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes spin-pulse {
+    0%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+    50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
 }
 
 /* Clear Button */
 #clear-btn {
     background-color: #4b5563; /* bg-gray-600 */
     color: white;
+    transition: all 0.4s ease-in-out;
 }
 #clear-btn:hover:not(:disabled) {
     background-color: #374151; /* hover:bg-gray-700 */
+    box-shadow: 0px 2px 4px 0px #2c88f072;
 }
 #clear-btn svg {
     height: 1.25rem; /* h-5 */
@@ -332,21 +359,43 @@ textarea:focus {
     color: #b91c1c; /* text-red-700 */
     padding: 1rem; /* px-4 py-3 */
     border-radius: 0.5rem; /* rounded-lg */
-    margin-bottom: 1.5rem; /* mb-6 */
+    margin-bottom: 1rem;
+   margin-top: -1rem;/* mb-6 */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s, margin-bottom 0.3s ease-in-out, padding 0.3s ease-in-out;
+    /* Ensure it's hidden initially */
+    visibility: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
-
+#error-message.show {
+     /* NEW: Class to trigger the animation */
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
 #error-message strong {
     font-weight: 700; /* font-bold */
 }
 
 #copy-msg {
-    color: #16a34a; /* text-green-600 */
+    color: #1aa54d; /* text-green-600 */
     font-size: 0.875rem; /* text-sm */
     margin-bottom: 0.5rem; /* mb-2 */
     display: block; /* To make margin work */
+    text-align: center;
 }
 
 .hidden {
+    /* We keep this for other elements, but the specific #error-message.hidden rule will take precedence for the error box */
+    display: none; 
+}
+
+.hidden:not(#error-message) {
     display: none !important;
 }
 /* --- Particle Animation --- */
@@ -428,11 +477,11 @@ textarea:focus {
     width: auto; /* Allow buttons to size to content */
 }
 
-.button-secondary:hover:not(:disabled) {
+.button-secondary:hover:not(:disabled){
     background-color: #eff6ff; /* blue-50 */
 }
 
-.button-secondary:focus {
+.button-secondary:focus{
     box-shadow: 0 0 0 2px white, 0 0 0 4px #2563eb;
 }
 
