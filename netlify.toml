@@ -1,3 +1,12 @@
-[build]
-  # This tells Netlify to look for functions in the 'api' directory
+# This is the configuration file for Netlify.
+# It tells Netlify how to build and deploy your site.
+
+[dev]
+  # This tells the local 'netlify dev' server which folder contains your serverless functions.
   functions = "api"
+
+[[redirects]]
+  # This rule proxies all requests from "/api/*" to your Netlify functions.
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

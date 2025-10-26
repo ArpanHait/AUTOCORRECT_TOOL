@@ -186,8 +186,8 @@ textarea:focus {
 }
 
 #output-text {
-    background-color: #cee4ef; /* bg-gray-100 */
-    border: 2px solid #d1d5db;
+    background-color: #eaeef0e2; /* bg-gray-100 */
+    border: 1px solid #d1d5db;
     min-height: 220px; /* From rows=8 */
     transition: all 0.3s ease-in-out;
     padding: 1rem;
@@ -297,22 +297,32 @@ label[for="input-text"] span:hover {
 
 @keyframes spin-pulse {
     0%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
-    50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+    50% { transform: rotate(360deg) scale(1.1); opacity: 0.5; }
 }
 
 /* Clear Button */
 #clear-btn {
     background-color: #4b5563; /* bg-gray-600 */
     color: white;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    border: none; /* Remove the original border */
+    outline: 2px solid rgba(41, 18, 125, 0.493); /* This will be the frame */
+    outline-offset: 3px; /* This creates the gap between the button and the outline frame */
 }
 #clear-btn:hover:not(:disabled) {
     background-color: #374151; /* hover:bg-gray-700 */
-    box-shadow: 0px 2px 4px 0px #2c88f072;
+    box-shadow: 0px 0px 6px 0px #2c87f088;
+    transform: scale(1.08) translateZ(25px);
 }
 #clear-btn svg {
     height: 1.25rem; /* h-5 */
     width: 1.25rem; /* w-5 */
+    transition: transform 0.4s ease-in-out; /* Add transition for smooth animation */
+}
+
+/* NEW: Add rotation animation to the clear button's icon on hover */
+#clear-btn:hover:not(:disabled) svg {
+    transform: scale(1.04) rotate(47deg);
 }
 
 /* --- Output Section --- */
@@ -459,7 +469,7 @@ label[for="input-text"] span:hover {
     animation: spin 1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
     height: 1.25rem; /* h-5 */
     width: 1.25rem;  /* w-5 */
-    color: #2563eb; /* blue-600 */
+    color: #25a9eb; /* blue-600 */
 }
 
 .tone-buttons {

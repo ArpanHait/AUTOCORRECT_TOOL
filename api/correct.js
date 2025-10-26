@@ -1,5 +1,6 @@
 // --- Gemini API Configuration ---
 // These definitions are now secure on the backend
+const GEMINI_MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
 const SYSTEM_INSTRUCTION = `You are an expert proofreader. Your task is to correct grammar, spelling, and punctuation errors in the provided text.
 You MUST respond in the requested JSON format.
 Your response must include:
@@ -21,10 +22,23 @@ const RESPONSE_SCHEMA = {
 // The main Netlify Function handler
 // Netlify automatically knows 'exports.handler' is the function to run
 exports.handler = async (event, context) => {
-    // 1. Only allow POST requests
-    if (event.httpMethod !== 'POST') {
+    // Handle preflight CORS OPTIONS request
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Or your specific domain
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            },
+            body: '',
+        };
+    } else if (event.httpMethod !== 'POST') { // 1. Only allow POST requests (after OPTIONS)
         return {
             statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ error: 'Method Not Allowed' }),
         };
     }
@@ -35,6 +49,9 @@ exports.handler = async (event, context) => {
         if (!inputText) {
             return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
                 body: JSON.stringify({ error: 'inputText is required' }),
             };
         }
@@ -47,11 +64,14 @@ exports.handler = async (event, context) => {
             console.error('API key is missing from environment variables');
             return {
                 statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
                 body: JSON.stringify({ error: 'Server configuration error' }),
             };
         }
         
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent?key=${apiKey}`;
 
         // 4. Construct the payload to send to Gemini
         const payload = {
@@ -95,6 +115,9 @@ exports.handler = async (event, context) => {
         // 7. Send the clean data back to the frontend
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ correctedText, wrongWords })
         };
 
@@ -102,6 +125,9 @@ exports.handler = async (event, context) => {
         console.error('Error in Netlify function:', error);
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ error: error.message || 'An unknown server error occurred' })
         };
     }

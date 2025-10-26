@@ -169,19 +169,31 @@ function displayResults(correctedText, wrongWords) {
 }
 
 function handleClear() {
-    // (Your other clearing logic is here and is correct)
+    // 1. Clear the content of text areas and the highlighted display
     inputTextarea.value = '';
     outputTextarea.value = '';
+    inputDisplay.innerHTML = '';
     
+    // 2. Reset UI visibility to the initial state
+    inputTextarea.classList.remove('hidden'); // Show the input textarea
+    inputDisplay.classList.add('hidden');     // Hide the highlighted display
+    
+    outputContainer.classList.add('hidden');  // Hide the entire output section
+    copyBtn.classList.add('hidden');          // Hide the copy button
+    clearBtn.classList.add('hidden');         // Hide the clear button
+    correctBtn.classList.remove('hidden');    // Show the main correct button again
+    
+    // 3. Reset button states
+    correctBtn.disabled = false;
+    clearBtn.disabled = true; // Disable clear since there's nothing to clear
+
+    // 4. Hide any active messages or secondary UI
     copyMsg.classList.add('hidden');
     if (errorHideTimeout) {
         clearTimeout(errorHideTimeout);
         errorHideTimeout = null;
     }
     errorMessage.classList.remove('show');
-    errorMessage.classList.add('hidden'); // Re-add the hidden class
-    
-    // Hide tone changer
     toneChangerContainer.classList.add('hidden');
 }
 
@@ -195,17 +207,7 @@ function handleCopy() {
         copyMsg.classList.add('hidden');
     }, 2000);
 }
-// ... (your existing handleCopy function)
-function handleCopy() {
-    outputTextarea.select();
-    document.execCommand('copy');
-    window.getSelection().removeAllRanges();
 
-    copyMsg.classList.remove('hidden');
-    setTimeout(() => {
-        copyMsg.classList.add('hidden');
-    }, 2000);
-}
 
 // NEW: Particle generation functions
 function generateParticles(numParticles) {

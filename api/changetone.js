@@ -5,11 +5,26 @@
  * This function securely calls the Gemini API to rewrite text based on a given tone.
  */
 
+const GEMINI_MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
+
 exports.handler = async (event, context) => {
-    // 1. Only allow POST requests
-    if (event.httpMethod !== 'POST') {
+    // Handle preflight CORS OPTIONS request
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Or your specific domain
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            },
+            body: '',
+        };
+    } else if (event.httpMethod !== 'POST') { // 1. Only allow POST requests (after OPTIONS)
         return {
             statusCode: 405,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ error: 'Method Not Allowed' }),
         };
     }
@@ -20,6 +35,9 @@ exports.handler = async (event, context) => {
         if (!inputText || !tone) {
             return {
                 statusCode: 400,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
                 body: JSON.stringify({ error: 'inputText and tone are required' }),
             };
         }
@@ -31,11 +49,14 @@ exports.handler = async (event, context) => {
             console.error('API key is missing from environment variables');
             return {
                 statusCode: 500,
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
                 body: JSON.stringify({ error: 'Server configuration error' }),
             };
         }
         
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent?key=${apiKey}`;
 
         // 4. Create the correct System Prompt based on the tone
         let systemPrompt = "You are an expert writing assistant. Please rewrite the following text.";
@@ -93,6 +114,9 @@ exports.handler = async (event, context) => {
         // 8. Send the clean data back to the frontend
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ newText: newText.trim() }) // Send the rewritten text
         };
 
@@ -100,6 +124,9 @@ exports.handler = async (event, context) => {
         console.error('Error in changeTone function:', error);
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
             body: JSON.stringify({ error: error.message || 'An unknown server error occurred' })
         };
     }
