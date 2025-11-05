@@ -278,6 +278,7 @@ label[for="output-text"] span:hover {
     background: linear-gradient(-45deg, #dab9f8d7, #fbc2ebd7, #83c1fe, #a1c4fdd0,#f89eded7, #c17eff8f);
     background-size: 400% 400%; /* ADD: Ensure size is also on hover */
     animation: gradient 3s ease infinite; /* CHANGE: Speed up the animation on hover */
+    
 }
 
 #correct-btn .icon-box {
@@ -443,9 +444,9 @@ label[for="output-text"] span:hover {
 #particles-container {
     position: fixed;
     inset: 0;
-    z-index: -9; /* Slightly above gradient but below content */
-    overflow: hidden; /* Hide particles that go off screen */
-    pointer-events: none; /* Allows clicks to pass through */
+    z-index: -9; 
+    overflow: hidden; 
+    pointer-events: none; 
 }
 
 .particle {
@@ -462,24 +463,24 @@ label[for="output-text"] span:hover {
 @keyframes float-and-fade {
     0% {
         transform: translateY(0) translateX(0) scale(1);
-        opacity: 0; /* Start faded out */
+        opacity: 0;
     }
     10% {
-        opacity: 0.6; /* Fade in */
+        opacity: 0.6; 
     }
     50% {
         transform: translateY(calc(var(--float-distance) * -1)) translateX(calc(var(--float-distance) / 2)) scale(1.1);
-        opacity: 1; /* Max opacity */
+        opacity: 1; 
     }
     90% {
-        opacity: 0.6; /* Fade out */
+        opacity: 0.6;
     }
     100% {
         transform: translateY(0) translateX(0) scale(1);
-        opacity: 0; /* End faded out */
+        opacity: 0;
     }
 }
-/* --- Styles for the Tone Changer --- */
+
 #tone-changer-container {
     margin-top: 1.5rem;
 }
@@ -499,7 +500,7 @@ label[for="output-text"] span:hover {
     animation: spin 1.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
     height: 1.5rem;
     width: 1.5rem;
-    border: 3.5px solid #ffffff; /* Light grey border */
+    border: 3.5px solid #ffffff; 
     border-top-color: #25afff; /* Blue color for the top part */
     border-radius: 50%;
 }
@@ -509,28 +510,33 @@ label[for="output-text"] span:hover {
 }
 .tone-buttons {
     gap: 1rem; /* Smaller gap */
-    justify-content: center; /* Align center */
+    justify-content: center; 
 }
 
 .button-secondary {
-    background-color: #ffffff;
-    color: #2563eb; /* blue-600 */
-    border: 1px solid #2563eb;
+    background: linear-gradient(-45deg,#e9fcffbb,#e6eeffb3,#ecfff8b0);
+    color: #22313bef;
     box-shadow: 0px 2px 4px 0px rgba(36, 77, 139, 0.397) ;
-    font-size: 0.875rem; /* text-sm */
-    padding: 0.5rem 1rem; /* Smaller padding */
-    width: auto; /* Allow buttons to size to content */
+    font-size: 0.875rem; 
+    padding: 0.5rem 1rem; 
+    transition: all 0.3s ease-in-out;
 }
 
 .button-secondary:hover:not(:disabled){
-    background-color: #eff6ff; /* blue-50 */
+    transform: scale(1.05) translateY(-5px);
 }
 
 .button-secondary:focus{
-    box-shadow: 0 0 0 2px white, 0 0 0 4px #2563eb;
+    border: 1px solid rgba(252, 252, 252, 0.87);
+    outline: none;
 }
 
-.button-secondary svg {
-    height: 1rem; /* h-4 */
-    width: 1rem; /* w-4 */
+.tone-icon {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+}
+
+
+.button-secondary:hover:not(:disabled) .tone-icon {
+    transform: scale(1.5) translateZ(200px);
 }
