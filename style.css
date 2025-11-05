@@ -186,7 +186,7 @@ textarea:focus {
 }
 
 #output-text {
-    background-color: #eaeef0e2; /* bg-gray-100 */
+    background-color: #ffffffdd; /* bg-gray-100 */
     border: 1px solid #d1d5db;
     min-height: 220px; /* From rows=8 */
     transition: all 0.3s ease-in-out;
@@ -194,16 +194,30 @@ textarea:focus {
 }
 /* NEW: Target the emoji in the label */
 label[for="input-text"] span {
-    display: inline-block; /* Required for transform to work */
+    display: inline-block;
     transition: all 0.5s ease-in-out;
 }
 label[for="input-text"] span:hover {
     transform: scale(1.5) translateY(-7px) rotate(360deg);
 }
-#output-text:focus {
+label[for="output-text"] span{
+   display: inline-block;
+   transition: all 0.5s ease-in-out;
+}
+label[for="output-text"] span:hover {
+    animation: bounce 0.5s ease-in-out infinite alternate ; /* Apply the bounce animation */
+}
+
+#output-text:hover {
     outline: none;
     border-color: #12b34d; /* focus:ring-green-500 */
-    box-shadow:inset 0px 0px 5px 0px #22c55e8c; /* focus:ring-2 */
+    box-shadow:inset 0px 0px 5px 0px #33ff7e9b; /* focus:ring-2 */
+}
+
+/* Keyframes for the bounce animation */
+@keyframes bounce {
+    from { transform:scale(1.5) translateY(2px);}
+    to { transform:scale(1.5) translateY(-15px);} /* Adjust translateY for the bounce height */
 }
 
 /* --- Button Container --- */
@@ -241,7 +255,7 @@ label[for="input-text"] span:hover {
     cursor: not-allowed;
 }
 
-  .button:focus {
+.button:focus {
     border: 2px solid rgba(252, 252, 252, 0.87);
     outline: none;
 }
@@ -255,14 +269,13 @@ label[for="input-text"] span:hover {
 
 /* Correct Button */
 #correct-btn {
-    /* background-color: #431ec9cf; */
     color: #ffffff;
     background: linear-gradient(-45deg, #d6b1fbf0,#3f92e4c7, #50bbf5c5);
     transition: all 0.4s ease-in-out;
 }
-     
+   
 #correct-btn:hover:not(:disabled) {
-    background: linear-gradient(-45deg, #dab9f8d7, #fbc2ebd7, #83c1fe, #a1c4fdd0);
+    background: linear-gradient(-45deg, #dab9f8d7, #fbc2ebd7, #83c1fe, #a1c4fdd0,#f89eded7, #c17eff8f);
     background-size: 400% 400%; /* ADD: Ensure size is also on hover */
     animation: gradient 3s ease infinite; /* CHANGE: Speed up the animation on hover */
 }
@@ -287,17 +300,19 @@ label[for="input-text"] span:hover {
     width: 1rem; /* w-4 */
 }
 
-/* Loader */
+
 #loader {
-    animation: spin-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    height: 1.5rem; /* h-6 */
-    width: 1.5rem; /* w-6 */
-    color: #ffffff;
+    animation: spin-pulse 1.5s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    height: 1.5rem;
+    width: 1.5rem;
+    border: 3.8px solid #ffffff; /* Light grey border */
+    border-top-color: #cf32fef0; /* Blue color for the top part */
+    border-radius: 50%;
 }
 
 @keyframes spin-pulse {
-    0%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
-    50% { transform: rotate(360deg) scale(1.1); opacity: 0.5; }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Clear Button */
@@ -317,7 +332,7 @@ label[for="input-text"] span:hover {
 #clear-btn svg {
     height: 1.25rem; /* h-5 */
     width: 1.25rem; /* w-5 */
-    transition: transform 0.4s ease-in-out; /* Add transition for smooth animation */
+    transition: transform 0.3s ease-in-out; /* Add transition for smooth animation */
 }
 
 /* NEW: Add rotation animation to the clear button's icon on hover */
@@ -329,6 +344,7 @@ label[for="input-text"] span:hover {
 #output-container {
     margin-top: 1.5rem; /* mt-6 */
 }
+
 .output-header {
     display: flex;
     justify-content: space-between;
@@ -342,27 +358,33 @@ label[for="input-text"] span:hover {
     align-items: center;
     gap: 0.375rem; /* gap-1.5 */
     font-size: 0.875rem; /* text-sm */
-    color: #374151; /* text-gray-700 */
+    color: #22313bef; /* text-gray-700 */
     font-weight: 500; /* font-medium */
-    background-color: #e5e7eb; /* bg-gray-200 */
+    background: linear-gradient(-45deg, #cafef8e1,#a8e3ffcf, #ffbffcdc);
+    box-shadow: 0px 2px 4px 0px rgba(36, 77, 139, 0.397) ;/* bg-gray-200 */
     border: none;
-    border-radius: 0.375rem; /* rounded-md */
+    border-radius: 0.4rem; /* rounded-md */
     padding: 0.375rem 0.75rem; /* px-3 py-1.5 */
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease-in-out;
 }
 #copy-btn:hover {
-    background-color: #d1d5db; /* hover:bg-gray-300 */
+    transform: scale(1.05);
 }
 #copy-btn:disabled {
     opacity: 0.5;
-}
-#copy-btn svg {
-    height: 1rem; /* h-4 */
-    width: 1rem; /* w-4 */
+    cursor: not-allowed;
 }
 
-/* --- Utility & Message Classes --- */
+#copy-btn .copy-icon {
+    display: inline-block;
+    font-size: 1.40rem;
+    transition: all 0.45s ease-in-out;
+}
+
+#copy-btn:hover:not(:disabled) .copy-icon {
+    transform: scale(1.2) rotate(360deg);
+}
 #error-message {
     background-color: #fee2e2; /* bg-red-100 */
     border: 1px solid #f87171; /* border-red-400 */
@@ -370,7 +392,7 @@ label[for="input-text"] span:hover {
     padding: 1rem; /* px-4 py-3 */
     border-radius: 0.5rem; /* rounded-lg */
     margin-bottom: 1rem;
-   margin-top: -1rem;/* mb-6 */
+    margin-top: -1rem;/* mb-6 */
     opacity: 0;
     transform: translateY(-10px);
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s, margin-bottom 0.3s ease-in-out, padding 0.3s ease-in-out;
@@ -386,18 +408,21 @@ label[for="input-text"] span:hover {
     transform: translateY(0);
     visibility: visible;
     padding: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem; 
 }
 #error-message strong {
     font-weight: 700; /* font-bold */
 }
 
 #copy-msg {
-    color: #1aa54d; /* text-green-600 */
+    color: #26b386; /* text-green-600 */
     font-size: 0.875rem; /* text-sm */
     margin-bottom: 0.5rem; /* mb-2 */
     display: block; /* To make margin work */
     text-align: center;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(-5px); /* Start slightly above its final position */
+    transition: all 0.4s ease-in-out;
 }
 
 .hidden {
@@ -407,6 +432,12 @@ label[for="input-text"] span:hover {
 
 .hidden:not(#error-message) {
     display: none !important;
+}
+
+/* Show the message with a smooth transition */
+#copy-msg:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
 }
 /* --- Particle Animation --- */
 #particles-container {
@@ -465,15 +496,19 @@ label[for="input-text"] span:hover {
 }
 
 #tone-loader {
-    /* Copied from #loader but made blue and smaller */
-    animation: spin 1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-    height: 1.25rem; /* h-5 */
-    width: 1.25rem;  /* w-5 */
-    color: #25a9eb; /* blue-600 */
+    animation: spin 1.2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    height: 1.5rem;
+    width: 1.5rem;
+    border: 3.5px solid #ffffff; /* Light grey border */
+    border-top-color: #25afff; /* Blue color for the top part */
+    border-radius: 50%;
 }
-
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 .tone-buttons {
-    gap: 0.5rem; /* Smaller gap */
+    gap: 1rem; /* Smaller gap */
     justify-content: center; /* Align center */
 }
 
@@ -481,7 +516,7 @@ label[for="input-text"] span:hover {
     background-color: #ffffff;
     color: #2563eb; /* blue-600 */
     border: 1px solid #2563eb;
-    box-shadow: none;
+    box-shadow: 0px 2px 4px 0px rgba(36, 77, 139, 0.397) ;
     font-size: 0.875rem; /* text-sm */
     padding: 0.5rem 1rem; /* Smaller padding */
     width: auto; /* Allow buttons to size to content */

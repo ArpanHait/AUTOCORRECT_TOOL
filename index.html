@@ -47,7 +47,7 @@
             
             <!-- Input Column -->
             <div>
-                <label for="input-text">Let Me Test. <span>😋</span></label>
+                <label for="input-text">Let Me Test It. <span>😋</span></label>
                 <textarea id="input-text" rows="10" placeholder="Paste your text here..."></textarea>
                 <div id="input-display" class="hidden"></div>
             </div>
@@ -83,18 +83,15 @@
             <!-- Output Column -->
             <div id="output-container" class="hidden">
                 <div class="output-header">
-                    <label for="output-text">Corrected Text 👇</label>
+                    <label for="output-text">Corrected Text. <span> 👇</span></label>
                     <!-- Copy Button -->
                     <button id="copy-btn" class="hidden">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a2.25 2.25 0 0 1-2.25 2.25h-3a2.25 2.25 0 0 1-2.25-2.25V4.5A2.25 2.25 0 0 1 9 2.25h3C13.5 2.25 15 3.75 15 5.25v.375Z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6.75h-9A1.5 1.5 0 0 0 6 8.25v9a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 16.5 6.75Z" />
-                        </svg>
+                        <span class="copy-icon"><b>⋉</b></span>
                         <span>Copy</span>
                     </button>
                 </div>
                 <!-- Copy success message -->
-                <span id="copy-msg" class="hidden">Copied to clipboard!</span>
+                <span id="copy-msg" class="hidden">Copied to Clipboard!</span>
                 
                 <!-- Output textarea -->
                 <textarea id="output-text" rows="8" readonly placeholder="Corrections will appear here..."></textarea>

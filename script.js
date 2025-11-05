@@ -22,6 +22,7 @@ const btnProfessional = document.getElementById('btn-professional');
 const btnFriendly = document.getElementById('btn-friendly');
 const btnConcise = document.getElementById('btn-concise');
 
+
 // --- API Configuration ---
 // The API call is now made to our OWN backend function
 // This path matches your 'api/correct.js' file structure
@@ -290,7 +291,7 @@ async function handleChangeTone(tone) {
 
     try {
         // We call a new, separate backend function for this
-        const result = await fetchWithRetry('/api/changeTone', { // <<< Calls the new backend function
+        const result = await fetchWithRetry('/api/changetone', { // <<< FIX: Match the lowercase filename 'changetone.js'
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
