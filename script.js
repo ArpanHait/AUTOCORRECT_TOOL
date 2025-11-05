@@ -257,11 +257,7 @@ function createParticle() {
     });
 }
 
-// --- (Should be after the createParticle function) ---
 
-/**
- * Shows/hides the loading state for the tone-changer buttons.
- */
 function setToneLoading(isLoading) {
     // Disable buttons
     btnProfessional.disabled = isLoading;
@@ -276,10 +272,6 @@ function setToneLoading(isLoading) {
     }
 }
 
-/**
- * Handles the "Change Tone" LLM call.
- * This calls a NEW, separate backend function: /api/changeTone
- */
 async function handleChangeTone(tone) {
     const currentText = outputTextarea.value;
     if (!currentText.trim()) {

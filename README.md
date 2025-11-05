@@ -3,6 +3,8 @@
 A sleek, modern web application that leverages the power of the Google Gemini API to provide real-time grammar and spelling correction, as well as the ability to rewrite text in different tones. The project features a responsive, animated UI and a secure, serverless backend built with Netlify Functions.
 
 ![Project Screenshot](IMAGE/previewof.png) <!-- TODO: Add a screenshot of the app to an 'assets' folder -->
+ 
+**[➡️ View Live Demo](arpcorrect.netlify.app)** <!-- TODO: Replace with your deployed site URL -->
 
 ## ✨ Features
 
@@ -34,7 +36,6 @@ AUTOCORRECT_TOOL/
 ├── api/
 │   ├── correct.js        # Netlify function for text correction
 │   └── changetone.js     # Netlify function for changing text tone
-│   └── changeTone.js     # Netlify function for changing text tone
 ├── index.html            # Main HTML file
 ├── script.js             # Frontend JavaScript for DOM manipulation and API calls
 ├── style.css             # All CSS styles and animations
