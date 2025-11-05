@@ -4,7 +4,7 @@ A sleek, modern web application that leverages the power of the Google Gemini AP
 
 ![Project Screenshot](IMAGE/previewof.png) <!-- TODO: Add a screenshot of the app to an 'assets' folder -->
  
-**[➡️ View Live Demo](arpcorrect.netlify.app)** <!-- TODO: Replace with your deployed site URL -->
+**[➡️ View Live Demo](https://arpcorrect.netlify.app)** <!-- TODO: Replace with your deployed site URL -->
 
 ## ✨ Features
 
