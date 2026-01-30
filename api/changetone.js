@@ -5,7 +5,7 @@
  * This function securely calls the Gemini API to rewrite text based on a given tone.
  */
 
-const GEMINI_MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
+const GEMINI_MODEL_NAME = 'gemini-2.5-flash-lite';
 
 exports.handler = async (event, context) => {
     // Handle preflight CORS OPTIONS request
