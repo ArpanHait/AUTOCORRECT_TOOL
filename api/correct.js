@@ -1,6 +1,6 @@
 // --- Gemini API Configuration ---
 // These definitions are now secure on the backend
-const GEMINI_MODEL_NAME = 'gemini-2.5-flash-lite';
+const GEMINI_MODEL_NAME = 'gemini-3.1-flash-lite-preview';
 const SYSTEM_INSTRUCTION = `You are an expert proofreader. Your task is to correct grammar, spelling, and punctuation errors in the provided text.
 You MUST respond in the requested JSON format.
 Your response must include:
